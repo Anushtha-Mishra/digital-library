@@ -18,15 +18,20 @@ def sign_up(email: str, password: str, full_name: str):
                 }).execute()
             except:
                 pass
-            return True, "Account created! You can now log in."
+            # Check if email confirmation is required
+            if res.session is None:
+                return True, "✅ Account created! Check your email inbox and click the confirmation link to activate your account, then log in."
+            return True, "✅ Account created! You can now log in."
         return False, "Signup failed. Please try again."
     except Exception as e:
         err = str(e)
-        if "already registered" in err or "already been registered" in err:
-            return False, "This email is already registered. Please log in."
-        if "rate limit" in err.lower() or "security purposes" in err.lower():
-            return False, "Too many attempts. Please wait 60 seconds."
-        return False, f"Error: {err}"
+        if "already registered" in err or "already been registered" in err or "already exists" in err.lower():
+            return False, "📧 This email is already registered. Please log in instead."
+        if "rate limit" in err.lower() or "security purposes" in err.lower() or "too many" in err.lower():
+            return False, "⏳ Too many signup attempts. Please wait 60 seconds and try again."
+        if "password" in err.lower() and ("short" in err.lower() or "weak" in err.lower() or "characters" in err.lower()):
+            return False, "🔒 Password is too weak. Please use at least 6 characters."
+        return False, f"❌ Signup error: {err}"
 
 
 def sign_in(email: str, password: str):
@@ -41,12 +46,18 @@ def sign_in(email: str, password: str):
             return True, "Welcome back!"
         return False, "Incorrect email or password."
     except Exception as e:
-        err = str(e)
-        if "Email not confirmed" in err:
-            return False, "Please confirm your email first."
-        if "timed out" in err.lower() or "ssl" in err.lower():
-            return False, "Connection timed out. Check your internet."
-        return False, "Incorrect email or password."
+        err = str(e).lower()
+        if "email not confirmed" in err or "not confirmed" in err:
+            return False, "📧 Email not confirmed. Check your inbox and click the confirmation link — or ask admin to disable email confirmation in Supabase dashboard."
+        if "invalid login" in err or "invalid credentials" in err or "wrong password" in err:
+            return False, "❌ Incorrect email or password."
+        if "user not found" in err or "no user found" in err:
+            return False, "❌ No account found with that email. Please sign up first."
+        if "timed out" in err or "ssl" in err or "getaddrinfo" in err:
+            return False, "🌐 Connection failed. Check your internet connection."
+        if "rate limit" in err or "security purposes" in err or "too many" in err:
+            return False, "⏳ Too many attempts. Please wait 60 seconds and try again."
+        return False, f"❌ Login failed: {str(e)}"
 
 
 def sign_out():

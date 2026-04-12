@@ -35,19 +35,32 @@ def show_reader():
 
         st.divider()
 
-        if st.button("🤖  Generate Summary", use_container_width=True):
-            with st.spinner("Generating summary..."):
+        if st.button("🤖  Generate Summary", use_container_width=True, key="reader_sum_btn"):
+            with st.spinner("⏳ AI is reading and summarizing..."):
                 summary = summarize_pdf(file_path)
-            st.success("Summary ready!")
-            st.write(summary)
+            if summary.startswith("❌"):
+                st.error(summary)
+            else:
+                st.success("✅ Summary ready!")
+                st.markdown(f"""
+                <div style="background:var(--surface);border:1px solid var(--border2);
+                    border-radius:12px;padding:20px;margin-top:10px;font-size:14px;line-height:1.7;">
+                    {summary}
+                </div>
+                """, unsafe_allow_html=True)
 
         st.divider()
 
-        question = st.text_input("Ask something about this document", placeholder="Type your question here...")
-        if st.button("Ask AI →", use_container_width=True):
+        st.markdown("💬 **Ask anything about this document**")
+        question = st.text_input("Question", placeholder="e.g. What is the budget summary?", label_visibility="collapsed")
+        if st.button("🚀 Ask AI →", use_container_width=True, key="reader_ask_btn"):
             if question:
-                with st.spinner("Thinking..."):
+                with st.spinner("🧠 AI is thinking..."):
                     answer = ask_question(file_path, question)
-                st.write(answer)
+                if answer.startswith("❌"):
+                    st.error(answer)
+                else:
+                    st.info("🤖 AI Answer")
+                    st.write(answer)
             else:
-                st.warning("Please enter a question first.")
+                st.warning("⚠️ Please enter a question first.")

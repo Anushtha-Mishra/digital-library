@@ -313,7 +313,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     selected = st.radio(
-        "", PAGES,
+        "Navigation", PAGES,
         index=PAGES.index(st.session_state.nav),
         key="sidebar_nav",
         label_visibility="collapsed",
@@ -510,19 +510,23 @@ elif st.session_state.nav == "🤖  Summarize":
             if st.button("🤖  Generate AI Summary", key="btn_gen_summary", use_container_width=True):
                 with st.spinner("⏳ AI is reading and summarizing your document..."):
                     summary = summarize_pdf(file_path)
-                st.success("✅ Summary generated!")
-                st.markdown(f"""
-                <div style="background:var(--surface);border:1px solid var(--border2);
-                    border-radius:14px;padding:24px 28px;margin-top:16px;">
-                  <div style="font-size:11px;color:var(--gold);font-weight:700;
-                      letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;">
-                    🤖 AI Summary
-                  </div>
-                  <div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap;">
+                
+                if summary.startswith("❌"):
+                    st.error(summary)
+                else:
+                    st.success("✅ Summary generated!")
+                    st.markdown(f"""
+                    <div style="background:var(--surface);border:1px solid var(--border2);
+                        border-radius:14px;padding:24px 28px;margin-top:16px;">
+                      <div style="font-size:11px;color:var(--gold);font-weight:700;
+                          letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;">
+                        🤖 AI Summary
+                      </div>
+                      <div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap;">
 {summary}
-                  </div>
-                </div>
-                """, unsafe_allow_html=True)
+                      </div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
 # ── ASK AI ──
 elif st.session_state.nav == "💬  Ask AI":
@@ -565,24 +569,29 @@ elif st.session_state.nav == "💬  Ask AI":
                 if question:
                     with st.spinner("🧠 AI is thinking..."):
                         answer = ask_question(file_path, question)
-                    st.markdown(f"""
-                    <div style="background:var(--surface);border:1px solid var(--border2);
-                        border-radius:14px;padding:24px 28px;margin-top:16px;">
-                      <div style="font-size:11px;color:var(--gold);font-weight:700;
-                          letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">
-                        💬 Your Question
-                      </div>
-                      <div style="font-size:14px;color:var(--muted2);margin-bottom:18px;
-                          font-style:italic;">"{question}"</div>
-                      <div style="height:1px;background:var(--border2);margin-bottom:18px;"></div>
-                      <div style="font-size:11px;color:var(--gold);font-weight:700;
-                          letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">
-                        🤖 AI Answer
-                      </div>
-                      <div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap;">
+                    
+                    if answer.startswith("❌"):
+                        st.error(answer)
+                    else:
+                        st.markdown(f"""
+                        <div style="background:var(--surface);border:1px solid var(--border2);
+                            border-radius:14px;padding:24px 28px;margin-top:16px;">
+                          <div style="font-size:11px;color:var(--gold);font-weight:700;
+                              letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">
+                            💬 Your Question
+                          </div>
+                          <div style="font-size:14px;color:var(--muted2);margin-bottom:18px;
+                              font-style:italic;">"{question}"</div>
+                          <div style="height:1px;background:var(--border2);margin-bottom:18px;"></div>
+                          <div style="font-size:11px;color:var(--gold);font-weight:700;
+                              letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;">
+                            🤖 AI Answer
+                          </div>
+                          <div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap;">
 {answer}
-                      </div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                          </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
                 else:
                     st.warning("⚠️ Please type a question first.")
