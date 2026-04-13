@@ -31,6 +31,10 @@ def sign_up(email: str, password: str, full_name: str):
             return False, "⏳ Too many signup attempts. Please wait 60 seconds and try again."
         if "password" in err.lower() and ("short" in err.lower() or "weak" in err.lower() or "characters" in err.lower()):
             return False, "🔒 Password is too weak. Please use at least 6 characters."
+        if "timed out" in err.lower() or "ssl" in err.lower() or "getaddrinfo" in err.lower() or "name or service not known" in err.lower():
+            from backend.supabase_client import SUPABASE_URL
+            masked_url = f"{SUPABASE_URL[:12]}...{SUPABASE_URL[-5:]}" if SUPABASE_URL else "None"
+            return False, f"🌐 Connection failed. Check Supabase URL in Railway. (Detected: {masked_url})"
         return False, f"❌ Signup error: {err}"
 
 
@@ -53,10 +57,10 @@ def sign_in(email: str, password: str):
             return False, "❌ Incorrect email or password."
         if "user not found" in err or "no user found" in err:
             return False, "❌ No account found with that email. Please sign up first."
-        if "timed out" in err or "ssl" in err or "getaddrinfo" in err:
-            return False, "🌐 Connection failed. Check your internet connection."
-        if "rate limit" in err or "security purposes" in err or "too many" in err:
-            return False, "⏳ Too many attempts. Please wait 60 seconds and try again."
+        if "timed out" in err or "ssl" in err or "getaddrinfo" in err or "name or service not known" in err:
+            from backend.supabase_client import SUPABASE_URL
+            masked_url = f"{SUPABASE_URL[:12]}...{SUPABASE_URL[-5:]}" if SUPABASE_URL else "None"
+            return False, f"🌐 Connection failed. Check Supabase URL in Railway. (Detected: {masked_url})"
         return False, f"❌ Login failed: {str(e)}"
 
 

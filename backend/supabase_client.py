@@ -30,12 +30,16 @@ if "xxxxxxxxxxxx" in SUPABASE_KEY:
     st.stop()
 
 try:
+    if not SUPABASE_URL.startswith("http"):
+        raise ValueError(f"Invalid URL protocol. URL starts with: {SUPABASE_URL[:10]}...")
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 except Exception as e:
+    masked_url = f"{SUPABASE_URL[:12]}...{SUPABASE_URL[-5:]}" if SUPABASE_URL else "None"
     st.error(
-        f"⚠️ **Cannot connect to Supabase** — `{e}`\n\n"
-        "Your `SUPABASE_URL` in `.env` is invalid or unreachable.\n\n"
-        "👉 Go to [Supabase Dashboard → Settings → API](https://supabase.com/dashboard) "
-        "and copy your real **Project URL** into `.env`."
+        f"⚠️ **Cannot connect to Supabase**\n\n"
+        f"**Error:** `{e}`\n"
+        f"**Detected URL:** `{masked_url}`\n\n"
+        "Your `SUPABASE_URL` in Railway is likely incorrect or has a typo.\n"
+        "👉 [Go to Supabase Dashboard](https://supabase.com/dashboard) and copy the **Project URL**."
     )
     st.stop()
