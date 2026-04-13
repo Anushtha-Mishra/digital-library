@@ -7,7 +7,7 @@ import streamlit as st
 load_dotenv(override=True)
 
 def get_groq_client():
-    api_key = os.getenv("GROQ_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
     if not api_key or "gsk_" not in api_key:
         return None
     try:
